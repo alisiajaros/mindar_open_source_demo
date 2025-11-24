@@ -1,107 +1,15 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <title>MindAR AR-Demo</title>
-
-  <!-- A-Frame -->
-  <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
-
-  <!-- MindAR -->
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-  <style>
-    body { margin:0; overflow:hidden; font-family:sans-serif; }
-
-    /* Startscreen Overlay */
-    #startScreen {
-      position: fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background:white;
-      display:flex; justify-content:center; align-items:center;
-      z-index:10;
-    }
-    #startBtn {
-      font-size:20px;
-      padding:15px 30px;
-      border-radius:10px;
-      background-color:#007BFF;
-      color:white;
-      border:none;
-      cursor:pointer;
-    }
-
-    /* Hinweistext */
-    #log {
-      position:absolute;
-      top:10px; left:50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      color:white;
-      padding:5px 10px;
-      border-radius:5px;
-      z-index:5;
-      font-size:14px;
-    }
-  </style>
-</head>
-<body>
-
-<div id="startScreen">
-  <button id="startBtn">AR starten</button>
-</div>
-
-<div id="log">Drücke "AR starten", um die Kamera zu aktivieren.</div>
-
-<!-- MindAR Szene -->
-<a-scene id="arScene" mindar-image="imageTargetSrc: targets.mind;" embedded color="#ECECEC">
-  <a-camera look-controls="false"></a-camera>
-  <a-entity mindar-image-target="targetIndex:0">
-    <a-box position="0 0.1 0" scale="0.2 0.2 0.2" rotation="0 45 0" color="red"></a-box>
-  </a-entity>
-</a-scene>
-
-<script>
-const btn = document.getElementById('startBtn');
-const startScreen = document.getElementById('startScreen');
-const log = document.getElementById('log');
-const scene = document.getElementById('arScene');
-
-btn.addEventListener('click', async () => {
-  // Startscreen ausblenden
-  startScreen.style.display = 'none';
-  log.innerText = 'AR Szene wird gestartet…';
-
-  // MindAR-Komponente holen
-  const mindarScene = scene.components['mindar-image'];
-  if (!mindarScene) {
-    log.innerText = 'Fehler: MindAR-Komponente nicht gefunden';
-    console.error('MindAR-Komponente nicht gefunden');
-    return;
-  }
-
-  // Target Event-Listener setzen
-  const targetEntity = document.querySelector('[mindar-image-target]');
-  if (targetEntity) {
-    targetEntity.addEventListener('targetFound', () => {
-      log.innerText = 'Target erkannt!';
-    });
-    targetEntity.addEventListener('targetLost', () => {
-      log.innerText = 'Bitte halte dein Target-Bild vor die Kamera';
-    });
-  }
-
-  // Kamera und AR starten
-  try {
-    await mindarScene.start();
-    log.innerText = 'Kamera gestartet. Halte dein Target-Bild vor die Kamera.';
-  } catch(e) {
-    log.innerText = 'Fehler beim Starten der AR-Szene: ' + e;
-    console.error(e);
-  }
-});
-</script>
-
-</body>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane color="blue" opacity="0.5" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
+      </a-entity>
+    </a-scene>
+  </body>
 </html>
