@@ -1,38 +1,70 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>MindAR Demo</title>
+<head>
+  <meta charset="UTF-8">
+  <title>MindAR iPhone Demo</title>
 
-    <!-- A-Frame -->
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
+  <!-- A-Frame -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
 
-    <!-- MindAR -->
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <style>
-      body { margin: 0; overflow: hidden; }
-    </style>
-  </head>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: sans-serif; }
+    #loading {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      z-index: 10;
+    }
+  </style>
+</head>
 
-  <body>
-    <!-- MindAR Szene -->
-    <a-scene mindar-image="imageTargetSrc: targets.mind;" embedded color-space="sRGB">
+<body>
+  <div id="loading">Bitte halte dein Target-Bild vor die Kamera</div>
 
-      <!-- Kamera -->
-      <a-camera look-controls="false"></a-camera>
+  <a-scene mindar-image="imageTargetSrc: targets.mind;" embedded color="#ECECEC">
 
-      <!-- 3D-Objekt, das erscheint, wenn das Bild erkannt wird -->
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-box 
-          position="0 0.1 0" 
-          scale="0.2 0.2 0.2" 
-          rotation="0 45 0" 
-          color="red">
-        </a-box>
-      </a-entity>
+    <!-- Kamera -->
+    <a-camera look-controls="false"></a-camera>
 
-    </a-scene>
-  </body>
+    <!-- 3D-Objekt über Target -->
+    <a-entity mindar-image-target="targetIndex: 0">
+      <a-box 
+        position="0 0.1 0" 
+        scale="0.2 0.2 0.2" 
+        rotation="0 45 0" 
+        color="red">
+      </a-box>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    // MindAR Szene starten und Kamera anfordern
+    const scene = document.querySelector('a-scene');
+    scene.addEventListener('renderstart', () => {
+      const loading = document.getElementById('loading');
+      loading.innerText = 'Scannen läuft...';
+    });
+
+    // Wenn Target erkannt wird, Hinweis ausblenden
+    const target = document.querySelector('[mindar-image-target]');
+    target.addEventListener('targetFound', () => {
+      document.getElementById('loading').style.display = 'none';
+    });
+
+    target.addEventListener('targetLost', () => {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('loading').innerText = 'Bitte halte dein Target-Bild vor die Kamera';
+    });
+  </script>
+
+</body>
 </html>
-
