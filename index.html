@@ -54,9 +54,9 @@
 <div id="log">Drücke "AR starten", um die Kamera zu aktivieren.</div>
 
 <!-- MindAR Szene -->
-<a-scene mindar-image="imageTargetSrc: targets.mind;" embedded id="arScene" style="display:none;" color="#ECECEC">
+<a-scene id="arScene" mindar-image="imageTargetSrc: targets.mind;" embedded style="display:none;" color="#ECECEC">
   <a-camera look-controls="false"></a-camera>
-  <a-entity mindar-image-target="targetIndex: 0">
+  <a-entity mindar-image-target="targetIndex:0">
     <a-box position="0 0.1 0" scale="0.2 0.2 0.2" rotation="0 45 0" color="red"></a-box>
   </a-entity>
 </a-scene>
@@ -73,10 +73,15 @@ btn.addEventListener('click', () => {
   scene.style.display = 'block';
   log.innerText = 'AR Szene wird gestartet…';
 
-  // MindAR erst starten, wenn die Szene initialisiert ist
-  scene.addEventListener('renderstart', async () => {
+  // Auf A-Frame load warten, damit MindAR-Komponente existiert
+  scene.addEventListener('loaded', async () => {
+    const mindarScene = scene.components['mindar-image'];
+    if (!mindarScene) {
+      log.innerText = 'Fehler: MindAR-Komponente nicht gefunden';
+      console.error('MindAR-Komponente nicht gefunden');
+      return;
+    }
     try {
-      const mindarScene = scene.components['mindar-image'];
       await mindarScene.start();
       log.innerText = 'Kamera gestartet. Halte dein Target-Bild vor die Kamera.';
     } catch(e) {
@@ -86,7 +91,7 @@ btn.addEventListener('click', () => {
   });
 });
 
-// Hinweistext aktualisieren, wenn Target erkannt / verloren wird
+// Hinweistext bei Target erkannt / verloren
 targetEntity.addEventListener('targetFound', () => {
   log.innerText = 'Target erkannt!';
 });
